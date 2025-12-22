@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand Colors */
+  --color-brand-gradient-start: #00A9CE;
+  --color-brand-gradient-end: #026B73;
+  --color-brand-primary: #026B73;
+  --color-brand-primary-dark: #176A70;
+  --color-brand-card-bg: #FFFFFF;
+  --color-brand-highlight: #25B6BA;
+  --color-brand-teal: #00695C;
+  --color-brand-teal-deep: #066F73;
+
+  /* Button Colors */
+  --color-btn-active: #374151;
+  --color-btn-inactive: #E5E7EB;
+
+  /* Text Colors */
+  --color-txt-active: #FFFFFF;
+  --color-txt-inactive: #476A78;
+  --color-txt-golden: #FFD700;
+
+  /* Font Family */
+  --font-proxima: 'Proxima Nova', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-proxima);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Hide scrollbar for horizontal scroll containers */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

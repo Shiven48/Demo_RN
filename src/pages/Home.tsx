@@ -56,13 +56,15 @@ export default function Home() {
 
   const products = useMemo(() => data?.docs ?? [], [data]);
 
+  const backgroundImage = "/assets/official/background/home.jpeg";
+
   return (
     <div className="flex-1 bg-white min-h-screen relative">
       {/* Background Pattern */}
       <div
         className="absolute inset-0 opacity-10 bg-cover bg-center pointer-events-none"
         style={{
-          backgroundImage: 'url(/images/home-bg.jpg)',
+          backgroundImage: `url(${backgroundImage})`,
           filter: 'blur(2px)',
         }}
       />

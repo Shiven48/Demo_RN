@@ -39,6 +39,7 @@ export default function Home() {
         const result = getProducts(currentPage, 10, selectedCategory, selectedType);
         setData(result);
       } catch (err) {
+        console.error(err);
         setError('Failed to load products');
       } finally {
         setIsLoading(false);

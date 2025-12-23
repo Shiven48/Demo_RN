@@ -28,19 +28,25 @@ export default function ProductCard({ product, index }: ProductCardProps) {
           <div className="absolute inset-0 bg-gradient-to-br from-[#F0FDFA] via-[#FCFBF1] to-[#F0FDFA]" />
 
           {/* Product Image */}
-          {product.imageUrl ? (
-            <img
-              src={product.imageUrl}
-              alt={product.name}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                // Fallback to placeholder if image fails to load
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                const placeholder = target.nextElementSibling as HTMLElement;
-                if (placeholder) placeholder.style.display = 'flex';
-              }}
-            />
+          {/* Construct the local path based on product code */}
+          {product.itemCode ? (
+            <div className="relative w-full h-full">
+              <img
+                src={`/assets/official/jpeg/${product.itemCode}.jpeg`}
+                alt={product.name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const placeholder = target.nextElementSibling as HTMLElement;
+                  if (placeholder) placeholder.style.display = 'flex';
+                }}
+              />
+              {/* Placeholder (hidden by default) */}
+              <div style={{ display: 'none' }} className="w-full h-full bg-gray-200 items-center justify-center">
+                <span>Image Not Found</span>
+              </div>
+            </div>
           ) : null}
           
           {/* Product Image Placeholder (fallback) */}

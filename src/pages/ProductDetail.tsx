@@ -20,6 +20,7 @@ import type { Product, ModalType } from '@/lib/types';
 import { Colors } from '@/lib/colors';
 
 const CUSTOM_PRODUCT_FAMILY = 'TURTLE ORTHO';
+const baseImagePath = `/assets/official/jpeg/`;
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -29,7 +30,6 @@ export default function ProductDetail() {
 
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeImageIndex] = useState(0);
 
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -39,6 +39,7 @@ export default function ProductDetail() {
   const [sizingInstructions, setSizingInstructions] = useState('');
   const [isSizeDropdownOpen, setIsSizeDropdownOpen] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   const [modalConfig, setModalConfig] = useState<{
     visible: boolean;
@@ -139,7 +140,7 @@ export default function ProductDetail() {
           quantity: 1,
           selected_size: selectedSize!,
           selected_color: selectedColor!,
-          image_url: product.imageUrl,
+          image_url: `/assets/official/jpeg/${product.itemCode}.jpeg`,
           features: product.features || [],
           notes: specialInstructions || undefined,
           sizing_notes: sizingInstructions || undefined,
@@ -162,6 +163,13 @@ export default function ProductDetail() {
         },
       });
     }, 500);
+  };
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const scrollPosition = e.currentTarget.scrollLeft;
+    const containerWidth = e.currentTarget.offsetWidth;
+    const index = Math.round(scrollPosition / containerWidth);
+    setActiveImageIndex(index); 
   };
 
   // Loading state
@@ -193,8 +201,8 @@ export default function ProductDetail() {
   }
 
   // Mock images for carousel
-  const images = [product.imageUrl, ...product.images.slice(0, 2)];
-
+  // const images = [`/assets/official/jpeg/${product.itemCode}.jpeg`, ...product.images.slice(0, 2)];
+  const carouselImages = [`${baseImagePath}/${product?.itemCode}.jpeg`];
   return (
     <div className="flex-1 relative bg-white min-h-screen pb-24">
       {/* Background Image */}
@@ -214,48 +222,80 @@ export default function ProductDetail() {
       </button>
 
       {/* Image Carousel */}
-      <div className="relative">
-        <div className="overflow-x-auto snap-x snap-mandatory flex hide-scrollbar">
-          {images.map((_, index) => (
+      <div className="relative group">
+        <div 
+          className="overflow-x-auto snap-x snap-mandatory flex hide-scrollbar h-80"
+          onScroll={handleScroll}
+        >
+          {carouselImages.map((src, index) => (
             <div
               key={index}
-              className="w-full flex-shrink-0 snap-center h-80 flex items-center justify-center"
+              className="w-full flex-shrink-0 snap-center h-full relative"
               style={{ minWidth: '100%' }}
             >
-              <div className="w-full h-full bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-                <div className="w-48 h-48 bg-white rounded-2xl shadow-inner flex items-center justify-center">
-                  <span className="text-8xl font-bold text-brand-primary/20">
+            <img
+              src={src}
+              alt={`${product.name} - view ${index + 1}`}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const placeholder = target.nextElementSibling as HTMLElement;
+                if (placeholder) placeholder.style.display = 'flex';
+              }}
+            />
+          
+              {/* Fallback Placeholder (Hidden if image loads) */}
+              <div 
+                style={{ display: 'none' }} 
+                className="absolute inset-0 bg-gray-100 flex-col items-center justify-center"
+              >
+                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-sm">
+                  <span className="text-4xl font-bold text-brand-primary/20">
                     {product.name.charAt(0)}
                   </span>
                 </div>
+                <p className="text-gray-400 text-xs mt-4 font-medium">Image not available</p>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Pagination Dots */}
-        {images.length > 1 && (
-          <div className="absolute bottom-4 left-0 right-0 flex justify-center">
-            <div className="bg-white/95 backdrop-blur-lg rounded-full px-4 py-2 flex shadow-lg border border-gray-200">
-              {images.map((_, index) => (
-                <div
-                  key={index}
-                  className={`rounded-full mx-1 transition-all ${
-                    index === activeImageIndex
-                      ? 'bg-btn-active w-6 h-2'
-                      : 'bg-btn-inactive w-2 h-2'
-                  }`}
-                />
-              ))}
-            </div>
+        {carouselImages.length > 1 && (
+          <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+            {carouselImages.map((_, index) => (
+              <div
+                key={index}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  index === activeImageIndex 
+                    ? 'bg-btn-active w-6' 
+                    : 'bg-white/60 w-1.5'
+                }`}
+              />
+            ))}
           </div>
         )}
+
+        {/* Badges */}
+        <div className="absolute top-4 right-4 flex flex-col items-end gap-2 pointer-events-none">
+          <div className="bg-gray-900/70 backdrop-blur-md rounded-full px-3 py-1 shadow-sm">
+            <span className="text-white text-[10px] font-bold">
+              {activeImageIndex + 1} / {carouselImages.length}
+            </span>
+          </div>
+          <div className="bg-white/90 border border-amber-200 rounded-full px-3 py-1 shadow-sm flex items-center">
+            <Maximize size={10} className="text-amber-600" />
+            <span className="text-amber-700 text-[10px] font-bold ml-1.5">
+              SWIPE FOR SIZING
+            </span>
+          </div>
+        </div>
 
         {/* Image Counter */}
         <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
           <div className="bg-gray-900/80 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-md">
             <span className="text-white text-xs font-semibold">
-              {activeImageIndex + 1} / {images.length}
+              {activeImageIndex + 1} / {carouselImages.length}
             </span>
           </div>
           <div className="bg-white/90 border border-gray-200 rounded-full px-3 py-1.5 shadow-md flex items-center">
